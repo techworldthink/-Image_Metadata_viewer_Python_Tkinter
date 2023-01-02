@@ -17,6 +17,11 @@ class Convert:
         master.geometry("1000x500")
         master.configure(bg="white")
 
+        # Demo model certificate
+        model = PIL.Image.open("images/demo_img.jpg")
+        newsize = (300, 150)
+        model = model.resize(newsize)
+        IMG_ = ImageTk.PhotoImage(model)
 
                 
         #full window row configure
@@ -43,8 +48,8 @@ class Convert:
 
         #END MENU #####################################################################
 
-        #labelled frames
-        self.frame_left     =  LabelFrame(master,text="Select Image",labelanchor="n",bg="white",bd=10,fg="red",font=self.label_frame_font)
+        #labelled frames - master
+        self.frame_left     =  LabelFrame(master,text="",labelanchor="n",bg="white",bd=10,fg="red",font=self.label_frame_font)
         self.frame_right    =  LabelFrame(master,text="Metadata",labelanchor="n",bg="white",bd=10,fg="red",font=self.label_frame_font)
 
         #frame grids
@@ -54,16 +59,32 @@ class Convert:
         #frame for componants for fisrt labeled frame  row configure  1
         self.frame_left.grid_rowconfigure(0, weight=1)
         self.frame_left.grid_rowconfigure(1, weight=1)
-        self.frame_left.grid_rowconfigure(2, weight=1)
         self.frame_left.columnconfigure(0, weight=1)
-        self.frame_left.columnconfigure(1, weight=1)
-        self.frame_left.columnconfigure(2, weight=1)
-        #componants for frame 1  
-        self.frame_left_btn1 = Button(self.frame_left,text="Choose Image",height = 5, width = 30,command=lambda:activate())
-        self.frame_left_btn2 = Button(self.frame_left,text="Get Metadata",height = 5, width = 30,command=lambda:activate())
+
+        #labelled frames - frame_left
+        self.frame_left_one     =  LabelFrame(self.frame_left,text="Select Image",labelanchor="n",bg="white",bd=10,fg="red",font=self.label_frame_font)
+        self.frame_right_two    =  LabelFrame(self.frame_left,text="Add metadata",labelanchor="n",bg="white",bd=10,fg="red",font=self.label_frame_font)
+
+        #frame grids
+        self.frame_left_one.grid(row=0,column=0,sticky="nsew")
+        self.frame_right_two.grid(row=1,column=0,sticky="nsew")
+
+        #frame for componants for left fisrt labeled frame  
+        self.frame_left_one.grid_rowconfigure(0, weight=1)
+        self.frame_left_one.grid_rowconfigure(1, weight=1)
+        self.frame_left_one.grid_rowconfigure(1, weight=1)
+        self.frame_left_one.columnconfigure(0, weight=1)
+        
+        
+        #componants for frame 1
+        self.frame_left_img  = Label(self.frame_left_one,image=IMG_,text="image",padx=0,pady=0,bg="white",fg="black",width=30)
+        self.frame_left_img.image = IMG_
+        self.frame_left_btn1 = Button(self.frame_left_one,text="Choose Image",height = 5, width = 30,command=lambda:activate())
+        self.frame_left_btn2 = Button(self.frame_left_one,text="Get Metadata",height = 5, width = 30,command=lambda:activate())
         #componants grid for frame 1
-        self.frame_left_btn1.grid(row=1,column=1)
-        self.frame_left_btn2.grid(row=2,column=1)
+        self.frame_left_img.grid(row=0,column=0,sticky="nsew")
+        self.frame_left_btn1.grid(row=1,column=0,sticky="nsew")
+        self.frame_left_btn2.grid(row=2,column=0,sticky="nsew")
 
 
         #frame for componants for fisrt labeled frame  row configure  2
@@ -81,11 +102,6 @@ class Convert:
 
         def activate():
             self.scroll_text.insert(tk.INSERT,"\nListening...")
-
-                
-
-            
-            
 
 
 
