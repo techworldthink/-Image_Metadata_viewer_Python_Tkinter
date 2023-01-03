@@ -10,9 +10,13 @@ from tkinter.filedialog import askopenfilename
 from tkinter.messagebox import showinfo
 from PIL import Image
 from PIL.ExifTags import TAGS
+import os
+from os.path import exists
 
 
 root = Tk()
+
+IMG_FILE = os.getcwd() + "/images/demo_img.jpg"
 
 class Convert:
     def __init__(self, master):
@@ -22,11 +26,11 @@ class Convert:
         master.configure(bg="white")
 
         # Demo model certificate
-        model = PIL.Image.open("images/demo_img.jpg")
+        model = PIL.Image.open(IMG_FILE)
         newsize = (300, 150)
         model = model.resize(newsize)
         IMG_ = ImageTk.PhotoImage(model)
-        IMG_FILE = "images/demo_img.jpg"
+
 
                 
         #full window row configure
@@ -106,9 +110,10 @@ class Convert:
 
 
         def choose_image():
+            global IMG_FILE
             filename = select_file()
             if filename:
-                self.IMG_FILE = filename
+                IMG_FILE = filename
                 model = PIL.Image.open(filename)
                 self.IMG_ = model
                 self.IM_width, self.IM_height = model.size
@@ -117,13 +122,16 @@ class Convert:
                 IMG_T = ImageTk.PhotoImage(model_show)
                 self.frame_left_img.configure(image=IMG_T)
                 self.frame_left_img.image = IMG_T
+                self.scroll_text.delete('1.0', END)
                 self.scroll_text.insert(tk.INSERT,"\nImage selected...\n")
+                self.scroll_text.insert(tk.INSERT,IMG_FILE + "\n")
 
         def get_metadata():
-            print(self.IMG_FILE)
+            global IMG_FILE
+            print(IMG_FILE)
             self.scroll_text.delete('1.0', END)
-            if self.IMG_FILE:
-                img = PIL.Image.open(self.IMG_FILE)
+            if exists(IMG_FILE):
+                img = PIL.Image.open(IMG_FILE)
                 img_exif = img.getexif()
                 if img_exif:
                     exif = {
@@ -137,6 +145,7 @@ class Convert:
                         print(exif[key])
                         self.scroll_text.insert(tk.INSERT,str(key) + " : " + str(exif[key]) +"\n")
                 else:
+                    self.scroll_text.insert(tk.INSERT,IMG_FILE + "\n")
                     self.scroll_text.insert(tk.INSERT,"\nNo metadata found!")
             
 
