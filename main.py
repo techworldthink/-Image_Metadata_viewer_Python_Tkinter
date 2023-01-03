@@ -3,11 +3,13 @@ from tkinter import*
 from tkinter import font
 from tkinter import messagebox
 from PIL import Image, ImageDraw, ImageFont,ImageTk
-import PIL.Image
+import PIL
 from tkinter.scrolledtext import ScrolledText
 import tkinter as tk
 from tkinter.filedialog import askopenfilename
 from tkinter.messagebox import showinfo
+from PIL import Image
+from PIL.ExifTags import TAGS
 
 
 root = Tk()
@@ -24,6 +26,7 @@ class Convert:
         newsize = (300, 150)
         model = model.resize(newsize)
         IMG_ = ImageTk.PhotoImage(model)
+        IMG_FILE = "images/demo_img.jpg"
 
                 
         #full window row configure
@@ -97,25 +100,45 @@ class Convert:
         #componants grid for frame 2
         self.scroll_text.grid(row=0,column=0)
                       
-        self.scroll_text.insert(tk.INSERT,"-------------LOGS----------\nStarting...")
+        self.scroll_text.insert(tk.INSERT,"-------------LOGS----------\nStarting...\n")
 
         
 
 
         def choose_image():
             filename = select_file()
-            model = PIL.Image.open(filename)
-            self.IMG_ = model
-            self.IM_width, self.IM_height = model.size
-            newsize = (300, 150)
-            model_show = model.resize(newsize)
-            IMG_ = ImageTk.PhotoImage(model_show)
-            self.frame_left_img.configure(image=IMG_)
-            self.frame_left_img.image = IMG_
-            self.scroll_text.insert(tk.INSERT,"\nImage selected...")
+            if filename:
+                self.IMG_FILE = filename
+                model = PIL.Image.open(filename)
+                self.IMG_ = model
+                self.IM_width, self.IM_height = model.size
+                newsize = (300, 150)
+                model_show = model.resize(newsize)
+                IMG_T = ImageTk.PhotoImage(model_show)
+                self.frame_left_img.configure(image=IMG_T)
+                self.frame_left_img.image = IMG_T
+                self.scroll_text.insert(tk.INSERT,"\nImage selected...\n")
 
         def get_metadata():
-            self.scroll_text.insert(tk.INSERT,"\nListening...")
+            print(self.IMG_FILE)
+            self.scroll_text.delete('1.0', END)
+            if self.IMG_FILE:
+                img = PIL.Image.open(self.IMG_FILE)
+                img_exif = img.getexif()
+                if img_exif:
+                    exif = {
+                        PIL.ExifTags.TAGS[k]: v
+                        for k, v in img._getexif().items()
+                        if k in PIL.ExifTags.TAGS
+                    }
+
+                    for key in exif:
+                        print(key)
+                        print(exif[key])
+                        self.scroll_text.insert(tk.INSERT,str(key) + " : " + str(exif[key]) +"\n")
+                else:
+                    self.scroll_text.insert(tk.INSERT,"\nNo metadata found!")
+            
 
         def select_file():
             filetypes = (
