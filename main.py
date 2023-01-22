@@ -1,16 +1,12 @@
 import os
-import cv2
-import time
 from tkinter.ttk import *
 from tkinter import*
 from tkinter import font
-from tkinter import messagebox
 from tkinter.scrolledtext import ScrolledText
 import tkinter as tk
 from tkinter.filedialog import askopenfilename
 from tkinter.messagebox import showinfo
-from os.path import exists
-from exif import Image
+
 
 
 root = Tk()
