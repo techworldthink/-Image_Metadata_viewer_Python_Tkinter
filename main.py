@@ -1,3 +1,6 @@
+import os
+import cv2
+import time
 from tkinter.ttk import *
 from tkinter import*
 from tkinter import font
@@ -6,16 +9,14 @@ from tkinter.scrolledtext import ScrolledText
 import tkinter as tk
 from tkinter.filedialog import askopenfilename
 from tkinter.messagebox import showinfo
-import os
 from os.path import exists
-
 from exif import Image
 
 
 root = Tk()
 
 IMG_FILE = ""
-img_data = ""
+img_data = []
 
 class Convert:
     def __init__(self, master):
@@ -76,7 +77,7 @@ class Convert:
         
         #componants for frame 1
         self.frame_left_btn1 = Button(self.frame_left_one,text="Choose Image",height = 3, width = 20,command=lambda:choose_image())
-        self.frame_left_btn2 = Button(self.frame_left_one,text="Choose Video",height = 3, width =20,command=lambda:choose_video()))
+        self.frame_left_btn2 = Button(self.frame_left_one,text="Choose Video",height = 3, width =20,command=lambda:choose_video())
         self.frame_left_btn3 = Button(self.frame_left_one,text="Show Meatadata",height = 3, width =20,command=lambda:get_metadata())
 
         #componants grid for frame 1
@@ -102,35 +103,39 @@ class Convert:
             global IMG_FILE
             global img_data
             filename = select_file()
+            temp_data = []
             self.scroll_text.insert(tk.INSERT,"Selected file is : " + filename +  "\n")
             if filename:
                 IMG_FILE = filename
                 try:
                     with open(IMG_FILE, 'rb') as img_file:
                         img = Image(img_file)
-                        img_data = [(tag,img.get(tag)) for tag in sorted(img.list_all())]
+                        temp_data = [(tag,img.get(tag)) for tag in sorted(img.list_all())]
                 except:
-                    self.scroll_text.insert(tk.INSERT,"This image has some problems!" + "\n")
-                                          
+                    self.scroll_text.insert(tk.INSERT,"\nThis image has some problems!" + "\n")
+                    
+            if exists(IMG_FILE):
+                for key,value in temp_data:
+                    img_data.append(key + " : "  + str(value))
+                                        
 
         def choose_video():
-            pass
+            filename = select_file()
+            self.scroll_text.insert(tk.INSERT,"Selected file is : " + filename +  "\n")
+
                     
         def get_metadata():
             global img_data
-            if exists(IMG_FILE):
-                for key,value in img_data:
-                    self.scroll_text.insert(tk.INSERT,key + " : "  + str(value) + "\n")
-            else:
+            global IMG_FILE
+            if len(img_data) < 1:
                 self.scroll_text.insert(tk.INSERT,"\nNo metadata found!")
-                
-            """
-                
-            self.scroll_text.insert(tk.INSERT,str(key) + " : " + str(exif[key]) +"\n")
-                else:
-                    self.scroll_text.insert(tk.INSERT,IMG_FILE + "\n")
-                    self.scroll_text.insert(tk.INSERT,"\nNo metadata found!")
-                    """
+            else:
+                 for lines in img_data:
+                     self.scroll_text.insert(tk.INSERT,lines + "\n")
+            img_data = []
+            IMG_FILE = []
+            
+
             
 
         def select_file():
@@ -152,6 +157,21 @@ class Convert:
             return filename
 
 
+        def print_metadata(file_name):
+            metadata_ = []
+            cmd="exiftool "+ file_name
+            metadata=os.popen(cmd).read()
+            metadata=metadata.split('\n')
+            
+            for each in metadata:
+                try:
+                    data = each.split(':')
+                    metadata_.append(data[0].rstrip() +" : "+ data[1])
+                except:
+                    pass
+
+
+        
 
 
 hack_gui = Convert(root)
