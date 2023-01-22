@@ -15,13 +15,12 @@ from exif import Image
 
 root = Tk()
 
-IMG_FILE = ""
 img_data = []
 
 class Convert:
     def __init__(self, master):
         self.master = master
-        master.title("Single Button Event")
+        master.title("Metadata viewer")
         master.geometry("1000x500")
         master.configure(bg="white")
 
@@ -51,8 +50,8 @@ class Convert:
         #END MENU #####################################################################
 
         #labelled frames - master
-        self.frame_left     =  LabelFrame(master,text="",labelanchor="n",bg="white",bd=10,fg="red",font=self.label_frame_font)
-        self.frame_right    =  LabelFrame(master,text="Metadata",labelanchor="n",bg="white",bd=10,fg="red",font=self.label_frame_font)
+        self.frame_left     =  LabelFrame(master,text="",labelanchor="n",bg="white",bd=0,fg="black",font=self.label_frame_font)
+        self.frame_right    =  LabelFrame(master,text="Metadata",labelanchor="n",bg="white",bd=0,fg="black",font=self.label_frame_font)
 
         #frame grids
         self.frame_left.grid(row=0,column=0,sticky="nsew")
@@ -63,7 +62,7 @@ class Convert:
         self.frame_left.columnconfigure(0, weight=1)
 
         #labelled frames - frame_left
-        self.frame_left_one     =  LabelFrame(self.frame_left,text="Select Image",labelanchor="n",bg="white",bd=10,fg="red",font=self.label_frame_font)
+        self.frame_left_one     =  LabelFrame(self.frame_left,text="Select Image",labelanchor="n",bg="white",bd=2,fg="black",font=self.label_frame_font)
 
         #frame grids
         self.frame_left_one.grid(row=0,column=0,sticky="nsew")
@@ -92,51 +91,34 @@ class Convert:
         #componants for frame 2
         self.scroll_text = ScrolledText(self.frame_right,bg="white",fg="green")
         #componants grid for frame 2
-        self.scroll_text.grid(row=0,column=0)
+        self.scroll_text.grid(row=0,column=0,sticky="nsew")
                       
         self.scroll_text.insert(tk.INSERT,"-------------LOGS----------\nStarting...\n")
 
         
 
-
         def choose_image():
-            global IMG_FILE
             global img_data
             filename = select_file()
             temp_data = []
-            self.scroll_text.insert(tk.INSERT,"Selected file is : " + filename +  "\n")
-            if filename:
-                IMG_FILE = filename
-                try:
-                    with open(IMG_FILE, 'rb') as img_file:
-                        img = Image(img_file)
-                        temp_data = [(tag,img.get(tag)) for tag in sorted(img.list_all())]
-                except:
-                    self.scroll_text.insert(tk.INSERT,"\nThis image has some problems!" + "\n")
-                    
-            if exists(IMG_FILE):
-                for key,value in temp_data:
-                    img_data.append(key + " : "  + str(value))
-                                        
+            self.scroll_text.insert(tk.INSERT,"\n\nSelected file is : " + filename +  "\n")
+            img_data = get_metadata_(filename)                                                      
 
         def choose_video():
+            global img_data
             filename = select_file()
-            self.scroll_text.insert(tk.INSERT,"Selected file is : " + filename +  "\n")
-
-                    
+            self.scroll_text.insert(tk.INSERT,"\n\nSelected file is : " + filename +  "\n")
+            img_data = get_metadata_(filename)
+    
         def get_metadata():
             global img_data
-            global IMG_FILE
             if len(img_data) < 1:
                 self.scroll_text.insert(tk.INSERT,"\nNo metadata found!")
             else:
                  for lines in img_data:
                      self.scroll_text.insert(tk.INSERT,lines + "\n")
             img_data = []
-            IMG_FILE = []
-            
-
-            
+                   
 
         def select_file():
             filetypes = (
@@ -157,7 +139,7 @@ class Convert:
             return filename
 
 
-        def print_metadata(file_name):
+        def get_metadata_(file_name):
             metadata_ = []
             cmd="exiftool "+ file_name
             metadata=os.popen(cmd).read()
@@ -169,6 +151,7 @@ class Convert:
                     metadata_.append(data[0].rstrip() +" : "+ data[1])
                 except:
                     pass
+            return metadata_
 
 
         
